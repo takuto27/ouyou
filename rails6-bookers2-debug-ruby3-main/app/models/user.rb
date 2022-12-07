@@ -51,4 +51,8 @@ class User < ApplicationRecord
       User.where('name LIKE ?', '%' + content + '%')
     end
   end
+
+  def already_favorited?(book)
+    self.favorites.exists?(book_id: book.id)
+  end
 end
