@@ -21,4 +21,12 @@ class Book < ApplicationRecord
       Book.where('title LIKE ?', '%'+content+'%')
     end
   end
+  
+  def self.search(search_word)
+    Book.where(['category LIKE ?', "#{search_word}"])
+  end
+
+  scope :latest, -> {order(created_at: :desc)}
+  scope :rate_count, -> {order(rate: :desc)}
+
 end

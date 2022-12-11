@@ -5,11 +5,18 @@ class BooksController < ApplicationController
   def show
     @book = Book.find(params[:id])
     @book_new = Book.new
+    @user = @book.user
     @book_comment = BookComment.new
   end
 
   def index
-    @books = Book.all
+    if params[:latest]
+      @books = Book.latest
+    elsif params[:rate_count]
+      @books = Book.rate_count
+    else
+      @books = Book.all
+    end
     @book = Book.new
   end
 
@@ -42,12 +49,22 @@ class BooksController < ApplicationController
     redirect_to books_path, notice: "successfully delete book!"
   end
 
+  def search_book
+    @keyword = params[:keyword]
+    @books = Book.search(@keyword)
+  end
+
   private
 
   def book_params
-    params.require(:book).permit(:title, :body)
+    params.require(:book).permit(:title, :body, :rate, :category)
   end
-end
+
+  def is_matching_login_user
+    @books = current_user.books
+    @book = @books.find_by(id: params[:id])
+    redirect_to books_path unless @book
+  end
 
   def ensure_correct_user
     @book = Book.find(params[:id])
@@ -55,3 +72,4 @@ end
       redirect_to books_path
     end
   end
+end
